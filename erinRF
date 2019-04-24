@@ -1,0 +1,30 @@
+#RF model with tuning parameter to pick optimal level of mtry (note: ntree may be way too high for such a large dataset).
+
+setwd("C:/Users/erinj/Desktop")
+
+
+#clear current objects
+rm(list = ls())
+
+#read csv of cleaned data
+training_data <- read.csv("311_cleaned.csv")
+
+#open libraries
+library(randomForest)
+library(class)
+
+#random forest prediction
+set.seed(71) 
+rf <-randomForest(completion_hours~.,data=training_data, mtry=7, ntree=500) 
+print(rf)
+
+#tuning to pick best level of mtry
+mtry <- tuneRF(training_data[-19],training_data$completion_hours, ntreeTry=500,
+               stepFactor=1.5,improve=0.01, trace=TRUE, plot=TRUE)
+best.m <- mtry[mtry[, 2] == min(mtry[, 2]), 1]
+print(mtry)
+print(best.m)
+
+#Evaluate variable importance
+importance(rf)
+varImpPlot(rf)
